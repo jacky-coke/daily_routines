@@ -104,9 +104,10 @@ images/                      Hinweise zu den Fortschrittsbildern
 
 ## Wichtig: Benachrichtigungen anpassen
 
-Im Original wird ein privater Teams-Webhook (`rest_command.notify_router`)
-verwendet – den hast nur du selbst, das funktioniert bei niemand anderem.
-In allen YAML-Dateien hier ist stattdessen testweise `notify.notify`
+Das Original-Set-up verschickt Benachrichtigungen über einen privaten
+Webhook (`rest_command.notify_router`), der individuell für die
+ursprüngliche Familie eingerichtet ist – der funktioniert bei dir nicht.
+Deshalb ist in allen YAML-Dateien hier stattdessen `notify.notify`
 (Standard-Benachrichtigung in Home Assistant) eingetragen. Ersetze das durch
 dein eigenes Ziel, z. B. `notify.mobile_app_<dein_handy>` oder eine eigene
 Telegram-/Signal-/Webhook-Integration.
