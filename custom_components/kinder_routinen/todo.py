@@ -82,9 +82,13 @@ class RoutineTodoListEntity(TodoListEntity):
         if item.summary is not None:
             await self._data.async_rename_item(self._index, item.uid, item.summary)
         if item.status is not None:
-            await self._data.async_apply_item_status(
-                self._index, item.uid, item.status.value
+            # HA liefert je nach Aufrufer entweder ein TodoItemStatus-Enum
+            # (z. B. aus dem Frontend) oder bereits einen rohen String (z. B.
+            # aus dem todo.update_item Service) - beides robust behandeln.
+            status_value = (
+                item.status.value if isinstance(item.status, TodoItemStatus) else item.status
             )
+            await self._data.async_apply_item_status(self._index, item.uid, status_value)
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:
         await self._data.async_delete_items(self._index, uids)
