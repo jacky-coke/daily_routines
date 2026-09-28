@@ -1,0 +1,13 @@
+# Blendet die Morgenroutine-Karte auf dem Dashboard nach der Frist wieder
+# aus (wird nachts vom nächtlichen Reset wieder eingeblendet).
+#
+# Passe 07:45:00 an deine eigene Frist an.
+
+alias: "Kind Morgenroutine – Ausblenden nach Frist"
+triggers:
+  - trigger: time
+    at: "07:45:00"
+actions:
+  - action: input_boolean.turn_off
+    target: { entity_id: input_boolean.kind_morgenroutine_sichtbar }
+mode: single

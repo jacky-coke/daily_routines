@@ -1,0 +1,55 @@
+# Setzt am Montagmorgen die Tagesstatus-/Fehlten-Texte der Vorwoche und den
+# Wochenzähler zurück. Das Sparkonto (Punktekonto) wird bewusst NICHT
+# zurückgesetzt.
+
+alias: "Kind – Wochenreset"
+description: >
+  Setzt montags um 00:01 die gespeicherten Tagesstatus/-Fehlten der
+  Vorwoche, die Morgen-Zwischenwerte und den Wochenpunkte-Zähler zurück.
+triggers:
+  - trigger: time
+    at: "00:01:00"
+conditions:
+  - condition: time
+    weekday: [mon]
+actions:
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_status_montag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_status_dienstag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_status_mittwoch }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_status_donnerstag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_status_freitag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_montag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_dienstag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_mittwoch }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_donnerstag }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_freitag }
+  - action: input_number.set_value
+    data: { value: 0 }
+    target: { entity_id: input_number.kind_erledigt_morgen_heute }
+  - action: input_text.set_value
+    data: { value: "" }
+    target: { entity_id: input_text.kind_fehlten_morgen_heute }
+  - action: counter.set_value
+    data: { value: 0 }
+    target: { entity_id: counter.kind_wochenpunkte }
+mode: single

@@ -1,0 +1,48 @@
+# Prüft freitagabends (nach dem Tagesabschluss), ob die Woche einen
+# Schwellwert erreicht hat, und verschickt eine Zusammenfassung.
+#
+# Passe an:
+#   23:57:00               -> Zeitpunkt NACH dem Tagesabschluss (15:00)
+#   above: 83               -> Schwellwert (hier: > 83 von 100 = ab 84 Punkten)
+#   notify.notify           -> DEIN Notify-Ziel (siehe README)
+
+alias: "Kind – Wochenbericht"
+description: >
+  Verschickt freitags eine Zusammenfassung mit Gesamtpunkten und den Tagen
+  mit offenen Punkten, sofern der Schwellwert erreicht wurde.
+triggers:
+  - trigger: time
+    at: "23:57:00"
+conditions:
+  - condition: time
+    weekday: [fri]
+  - condition: numeric_state
+    entity_id: counter.kind_wochenpunkte
+    above: 83
+actions:
+  - variables:
+      gesamt: "{{ states('counter.kind_wochenpunkte') }}"
+      zeile_mo: >-
+        {{ 'Montag: ' ~ states('input_text.kind_status_montag') ~ ' (fehlte: ' ~ states('input_text.kind_fehlten_montag') ~ ')'
+           if states('input_text.kind_fehlten_montag') not in ['', 'unknown', 'unavailable'] else '' }}
+      zeile_di: >-
+        {{ 'Dienstag: ' ~ states('input_text.kind_status_dienstag') ~ ' (fehlte: ' ~ states('input_text.kind_fehlten_dienstag') ~ ')'
+           if states('input_text.kind_fehlten_dienstag') not in ['', 'unknown', 'unavailable'] else '' }}
+      zeile_mi: >-
+        {{ 'Mittwoch: ' ~ states('input_text.kind_status_mittwoch') ~ ' (fehlte: ' ~ states('input_text.kind_fehlten_mittwoch') ~ ')'
+           if states('input_text.kind_fehlten_mittwoch') not in ['', 'unknown', 'unavailable'] else '' }}
+      zeile_do: >-
+        {{ 'Donnerstag: ' ~ states('input_text.kind_status_donnerstag') ~ ' (fehlte: ' ~ states('input_text.kind_fehlten_donnerstag') ~ ')'
+           if states('input_text.kind_fehlten_donnerstag') not in ['', 'unknown', 'unavailable'] else '' }}
+      zeile_fr: >-
+        {{ 'Freitag: ' ~ states('input_text.kind_status_freitag') ~ ' (fehlte: ' ~ states('input_text.kind_fehlten_freitag') ~ ')'
+           if states('input_text.kind_fehlten_freitag') not in ['', 'unknown', 'unavailable'] else '' }}
+  - variables:
+      tage_mit_luecke: "{{ [zeile_mo, zeile_di, zeile_mi, zeile_do, zeile_fr] | reject('eq', '') | list | join('\n') }}"
+  - variables:
+      bericht_text: "{{ 'Alle Schultage komplett geschafft! 🌟' if tage_mit_luecke == '' else 'Tage mit offenen Punkten:\n' ~ tage_mit_luecke }}"
+  - action: notify.notify
+    data:
+      title: "Wochenbericht 🎉"
+      message: "Gesamtpunkte diese Woche: {{ gesamt }} von 100\n\n{{ bericht_text }}"
+mode: single

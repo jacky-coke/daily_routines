@@ -1,0 +1,37 @@
+# Löst die im Helper "input_select.kind_belohnung_auswahl" gewählte
+# Belohnung ein: zieht bei ausreichendem Punktekonto-Guthaben die Kosten ab
+# und schickt eine Bestätigung. Reicht das Guthaben nicht, passiert nichts
+# außer einer Info-Nachricht.
+#
+# Ersetze notify.notify durch dein eigenes Ziel (siehe README).
+
+alias: "Kind Belohnung einlösen"
+sequence:
+  - variables:
+      auswahl: "{{ states('input_select.kind_belohnung_auswahl') }}"
+      kosten: "{{ states('input_select.kind_belohnung_auswahl').split(' – ')[0] | int(0) }}"
+      aktueller_stand: "{{ states('counter.kind_punktekonto') | int(0) }}"
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ aktueller_stand >= kosten }}"
+        sequence:
+          - action: counter.set_value
+            data:
+              value: "{{ aktueller_stand - kosten }}"
+            target:
+              entity_id: counter.kind_punktekonto
+          - action: notify.notify
+            data:
+              title: "Belohnung eingelöst 🎁"
+              message: >-
+                🎉 Eingelöst: {{ auswahl }} (−{{ kosten }} Punkte)
+
+                Neues Guthaben: {{ aktueller_stand - kosten }} Punkte
+    default:
+      - action: notify.notify
+        data:
+          title: "Belohnung – nicht genug Punkte"
+          message: >-
+            Einlösen nicht möglich: {{ auswahl }} kostet {{ kosten }} Punkte,
+            aktuelles Guthaben ist nur {{ aktueller_stand }}.

@@ -1,0 +1,114 @@
+# Läuft werktags nach der letzten Frist des Tages. Vergibt NUR den Tagesbonus
+# (die Basis-Punkte sind längst live vergeben, siehe morgen_live.yaml /
+# mittag_live.yaml) und schreibt den Tagesstatus für den Wochenbericht.
+#
+# Passe an:
+#   15:00:00     -> Zeitpunkt NACH der letzten Frist des Tages
+#   17           -> Gesamtzahl Aufgaben pro Tag (alle Routinen zusammen)
+#   3            -> Tagesbonus bei komplett fristgerechtem Tag
+#   todo.kind_*  -> deine Listen (für die "was fehlt"-Meldung im Wochenbericht)
+
+alias: "Kind Punkte – Tagesabschluss (Bonus & Report)"
+description: >
+  Ermittelt die Tagesquote aus den Live-Trackern, vergibt bei komplett
+  fristgerechtem Tag einen Bonus, und schreibt Tagesstatus/-fehlende für
+  den Wochenbericht.
+triggers:
+  - trigger: time
+    at: "15:00:00"
+conditions:
+  - condition: time
+    weekday: [mon, tue, wed, thu, fri]
+actions:
+  - action: todo.get_items
+    data: {}
+    target:
+      entity_id: todo.kind_morgenroutine
+    response_variable: morgen_items
+  - action: todo.get_items
+    data: {}
+    target:
+      entity_id: todo.kind_mittagsroutine
+    response_variable: mittag_items
+  - variables:
+      fehlende_morgen: >-
+        {{ morgen_items['todo.kind_morgenroutine']['items']
+           | selectattr('status','eq','needs_action')
+           | map(attribute='summary') | list | join(', ') }}
+      fehlende_mittag: >-
+        {{ mittag_items['todo.kind_mittagsroutine']['items']
+           | selectattr('status','eq','needs_action')
+           | map(attribute='summary') | list | join(', ') }}
+      erledigt_morgen: "{{ states('input_number.kind_erledigt_morgen_heute') | int(0) }}"
+      erledigt_mittag: "{{ states('input_number.kind_erledigt_mittag_heute') | int(0) }}"
+  - variables:
+      gesamt_erledigt: "{{ erledigt_morgen + erledigt_mittag }}"
+      bonus: "{{ 3 if (erledigt_morgen + erledigt_mittag) == 17 else 0 }}"
+  - variables:
+      tagespunkte: "{{ bonus }}"
+      status_text: "{{ gesamt_erledigt }}/17"
+      fehlende_liste: >-
+        {{ [fehlende_morgen, fehlende_mittag]
+           | reject('in', ['', 'unknown', 'unavailable']) | list | join(', ') }}
+  - choose:
+      - conditions:
+          - condition: time
+            weekday: [mon]
+        sequence:
+          - action: input_text.set_value
+            data: { value: "{{ status_text }}" }
+            target: { entity_id: input_text.kind_status_montag }
+          - action: input_text.set_value
+            data: { value: "{{ fehlende_liste }}" }
+            target: { entity_id: input_text.kind_fehlten_montag }
+      - conditions:
+          - condition: time
+            weekday: [tue]
+        sequence:
+          - action: input_text.set_value
+            data: { value: "{{ status_text }}" }
+            target: { entity_id: input_text.kind_status_dienstag }
+          - action: input_text.set_value
+            data: { value: "{{ fehlende_liste }}" }
+            target: { entity_id: input_text.kind_fehlten_dienstag }
+      - conditions:
+          - condition: time
+            weekday: [wed]
+        sequence:
+          - action: input_text.set_value
+            data: { value: "{{ status_text }}" }
+            target: { entity_id: input_text.kind_status_mittwoch }
+          - action: input_text.set_value
+            data: { value: "{{ fehlende_liste }}" }
+            target: { entity_id: input_text.kind_fehlten_mittwoch }
+      - conditions:
+          - condition: time
+            weekday: [thu]
+        sequence:
+          - action: input_text.set_value
+            data: { value: "{{ status_text }}" }
+            target: { entity_id: input_text.kind_status_donnerstag }
+          - action: input_text.set_value
+            data: { value: "{{ fehlende_liste }}" }
+            target: { entity_id: input_text.kind_fehlten_donnerstag }
+      - conditions:
+          - condition: time
+            weekday: [fri]
+        sequence:
+          - action: input_text.set_value
+            data: { value: "{{ status_text }}" }
+            target: { entity_id: input_text.kind_status_freitag }
+          - action: input_text.set_value
+            data: { value: "{{ fehlende_liste }}" }
+            target: { entity_id: input_text.kind_fehlten_freitag }
+  - action: counter.set_value
+    data:
+      value: "{{ states('counter.kind_wochenpunkte') | int(0) + tagespunkte }}"
+    target:
+      entity_id: counter.kind_wochenpunkte
+  - action: counter.set_value
+    data:
+      value: "{{ states('counter.kind_punktekonto') | int(0) + tagespunkte }}"
+    target:
+      entity_id: counter.kind_punktekonto
+mode: single

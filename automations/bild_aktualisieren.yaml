@@ -1,0 +1,55 @@
+# OPTIONAL / fortgeschritten – nur relevant, wenn du mit Fortschrittsbildern
+# arbeitest (siehe images/README.md). Ermittelt nach jeder Änderung der
+# Morgenroutine das passende Bild und legt den Dateinamen in
+# input_text.kind_routinebild ab.
+#
+# "zuordnung" unten: eigene Aufgaben-Texte (exakt wie in der To-Do-Liste,
+# ohne Emoji nötig) auf eigene Bilddateinamen mappen. Es zählt der zuletzt
+# abgehakte Eintrag (per Timestamp), unabhängig von der Reihenfolge in der
+# Liste. Der Vergleich ist ein Teilstring-Match, damit vorangestellte Emojis
+# das Matching nicht zerstören.
+
+alias: "Kind Morgenroutine – Bild aktualisieren"
+triggers:
+  - trigger: state
+    entity_id: todo.kind_morgenroutine
+  - trigger: homeassistant
+    event: start
+actions:
+  - action: todo.get_items
+    data: {}
+    target: { entity_id: todo.kind_morgenroutine }
+    response_variable: alle
+  - variables:
+      erledigt_anzahl: >-
+        {{ alle['todo.kind_morgenroutine']['items']
+           | selectattr('status','eq','completed') | list | count }}
+      gesamt: "{{ alle['todo.kind_morgenroutine']['items'] | count }}"
+      zuordnung:
+        "Aufgabe 1": "01_aufgabe1.jpg"
+        "Aufgabe 2": "02_aufgabe2.jpg"
+        # ... eigene Aufgaben/Bilder ergänzen
+  - variables:
+      kandidaten: >-
+        {% set ns = namespace(treffer=[]) %}
+        {% for eintrag in alle['todo.kind_morgenroutine']['items'] | selectattr('status','eq','completed') | selectattr('completed','defined') %}
+        {% for schluessel, datei in zuordnung.items() %}
+        {% if schluessel in eintrag.summary %}
+        {% set ns.treffer = ns.treffer + [{'completed': eintrag.completed, 'bild': datei}] %}
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+        {{ ns.treffer }}
+  - variables:
+      bild: >-
+        {% if gesamt > 0 and erledigt_anzahl == gesamt %}
+        10_alles_erledigt.jpg
+        {% elif kandidaten | count > 0 %}
+        {{ (kandidaten | sort(attribute='completed') | last).bild }}
+        {% else %}
+        00_grundbild.png
+        {% endif %}
+  - action: input_text.set_value
+    data: { value: "{{ bild }}" }
+    target: { entity_id: input_text.kind_routinebild }
+mode: queued

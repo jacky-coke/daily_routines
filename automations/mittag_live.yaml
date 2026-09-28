@@ -1,0 +1,47 @@
+# Analog zu morgen_live.yaml, für eine zweite Routine (z. B. "Mittagsroutine").
+# Ersetze die Platzhalter wie dort beschrieben; hier mit Beispiel-Frist 15:00
+# und 7 Aufgaben.
+
+alias: "Kind Punkte – Mittag Live"
+description: >
+  Live-Punktevergabe: bei jedem Häkchen in der Mittagsroutine wird sofort
+  1 Punkt je fristgerecht erledigtem Eintrag auf Wochenzähler und
+  Punktekonto gebucht bzw. beim Entfernen des Häkchens wieder abgezogen.
+triggers:
+  - trigger: state
+    entity_id: todo.kind_mittagsroutine
+conditions:
+  - condition: time
+    before: "15:00:00"
+  - condition: time
+    weekday: [mon, tue, wed, thu, fri]
+actions:
+  - variables:
+      alt: "{{ (trigger.from_state.state if trigger.from_state else '7') | int(7) }}"
+      neu: "{{ (trigger.to_state.state if trigger.to_state else '7') | int(7) }}"
+  - variables:
+      delta: "{{ alt - neu }}"
+  - condition: template
+    value_template: "{{ delta != 0 }}"
+  - variables:
+      bisher: "{{ states('input_number.kind_erledigt_mittag_heute') | int(0) }}"
+  - variables:
+      neu_wert: "{{ [[bisher + delta, 0] | max, 7] | min }}"
+  - variables:
+      angewendet: "{{ neu_wert - bisher }}"
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.kind_erledigt_mittag_heute
+    data:
+      value: "{{ neu_wert }}"
+  - action: counter.set_value
+    target:
+      entity_id: counter.kind_wochenpunkte
+    data:
+      value: "{{ states('counter.kind_wochenpunkte') | int(0) + angewendet }}"
+  - action: counter.set_value
+    target:
+      entity_id: counter.kind_punktekonto
+    data:
+      value: "{{ states('counter.kind_punktekonto') | int(0) + angewendet }}"
+mode: queued
