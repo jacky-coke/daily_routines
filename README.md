@@ -1,5 +1,7 @@
 # Kinder-Routinen mit Live-Punktesystem für Home Assistant
 
+[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jacky-coke&repository=daily_routines&category=integration)
+
 > Aus "hat sie die Zähne geputzt?" wird ein Dashboard, das von selbst mitzählt:
 > jede pünktlich erledigte Aufgabe gibt sofort einen Punkt, die Woche läuft auf
 > ein rundes Ziel, und am Ende winkt eine selbst gewählte Belohnung – ganz ohne
@@ -37,16 +39,32 @@ die abhakbare Routine, in der Mitte das Fortschrittsbild, rechts das
 Punkte-Barometer (Heute / Woche / Gesamt) samt Belohnungs-Checkliste und
 Einlösen-Button.
 
-## Was das hier NICHT ist
+## Zwei Wege, das zu nutzen
 
-Kein HACS-Add-on, keine Integration mit Config-Flow, kein Ein-Klick-Installer.
-Home Assistant hat keinen Mechanismus, der Automationen + Helper + Dashboard
-+ Bilder gebündelt bei jemand anderem installiert. Dieses Repo ist eine
-dokumentierte Bauanleitung zum Nachbauen/Anpassen – die zwei Live-Punkte-
-Automationen gibt es zusätzlich als [Blueprint](blueprints/automation/kinder-routine-live-punkte.yaml),
-den Rest kopierst du als YAML und passt Entity-IDs an.
+**Weg 1 – Custom Integration (empfohlen, per HACS installierbar):**
+Über den "HACS"-Button oben (oder HACS → Custom Repositories → diese
+Repo-URL eintragen) installierst du `custom_components/kinder_routinen/`.
+Danach richtest du pro Routine (Morgen/Mittag/…) über **Einstellungen →
+Geräte & Dienste → Integration hinzufügen → "Kinder-Routinen Punktesystem"**
+eine Instanz ein – ein Formular fragt nach To-Do-Liste, Frist-Uhrzeit,
+Wochentagen, Tagesbonus und Notify-Ziel. Kein manuelles Helper-Anlegen mehr
+nötig, die Aufgabenzahl wird automatisch aus der To-Do-Liste ermittelt.
+Details, Funktionsumfang und was noch fehlt: siehe
+[`custom_components/kinder_routinen/README.md`](custom_components/kinder_routinen/README.md).
 
-## Voraussetzungen
+Das ist Version 0.1 und deckt den Kern ab (Live-Punkte, nächtlicher Reset,
+Wochenreset, Tagesbonus) – die Belohnungs-Auswahl, der Wochenbericht und
+eine eigene Dashboard-Karte fehlen noch, siehe Roadmap dort.
+
+**Weg 2 – YAML zum Kopieren + Blueprint (das Original-Set-up):**
+Kein Add-on, keine Integration – du legst Helper von Hand an und kopierst
+Automationen/Dashboard als YAML. Mehr Kontrolle, mehr manueller Aufwand,
+dafür exakt das seit Monaten produktiv laufende Original. Die zwei
+Live-Punkte-Automationen gibt es zusätzlich als
+[Blueprint](blueprints/automation/kinder-routine-live-punkte.yaml), den Rest
+kopierst du als YAML und passt Entity-IDs an. Anleitung dazu weiter unten.
+
+## Voraussetzungen (Weg 2 – YAML)
 
 - Home Assistant (getestet mit aktuellen 2026.x-Versionen)
 - HACS, für die Dashboard-Karte [`bar-card`](https://github.com/custom-cards/bar-card)

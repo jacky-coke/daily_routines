@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Neue Routine einrichten",
+        "data": {
+          "name": "Name (z. B. \"Ronja Morgen\")",
+          "todo_entity": "To-Do-Liste",
+          "deadline": "Frist-Uhrzeit",
+          "weekdays": "Wochentage",
+          "bonus_points": "Tagesbonus (Punkte bei vollständig fristgerechtem Tag)",
+          "notify_target": "Notify-Ziel (z. B. notify.mobile_app_handy)"
+        }
+      }
+    },
+    "error": {
+      "empty_todo_list": "Die gewählte To-Do-Liste enthält keine Einträge. Lege zuerst Aufgaben an."
+    },
+    "abort": {
+      "already_configured": "Diese Routine ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "deadline": "Frist-Uhrzeit",
+          "weekdays": "Wochentage",
+          "bonus_points": "Tagesbonus",
+          "notify_target": "Notify-Ziel"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "punkte_heute": { "name": "Punkte heute" },
+      "tagesmax": { "name": "Tagesmax" },
+      "wochenpunkte": { "name": "Wochenpunkte" },
+      "punktekonto": { "name": "Punktekonto" }
+    }
+  }
+}
