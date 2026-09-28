@@ -211,34 +211,48 @@ async def _async_register_or_update(
 
 
 async def async_remove_dashboard(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Best-effort-Aufraeumen beim endgueltigen Entfernen des Eintrags."""
-    domain_data = hass.data.get(DOMAIN, {})
-    data = domain_data.get(entry.entry_id)
-    url_path = getattr(data, "dashboard_url_path", None) if data else None
-    item_id = getattr(data, "dashboard_item_id", None) if data else None
-    if not url_path:
-        return
-    try:
-        from homeassistant.components import frontend
-        from homeassistant.components.lovelace import dashboard as ll_dashboard
-        from homeassistant.components.lovelace.const import LOVELACE_DATA
-        from homeassistant.helpers.storage import Store
+    """Best-effort-Aufraeumen beim endgueltigen Entfernen des Eintrags.
 
-        frontend.async_remove_panel(hass, url_path, warn_if_unknown=False)
-        if LOVELACE_DATA in hass.data:
-            storage_dashboard = hass.data[LOVELACE_DATA].dashboards.pop(url_path, None)
-            if storage_dashboard is not None:
-                await storage_dashboard.async_delete()
+    WICHTIG: async_unload_entry laeuft VOR async_remove_entry und entfernt
+    dabei bereits das In-Memory-KinderRoutinenData-Objekt aus hass.data - an
+    dieser Stelle also nicht mehr verfuegbar. Die Dashboard-Infos werden
+    deshalb direkt aus dem eigenen, weiterhin vorhandenen Store gelesen statt
+    aus hass.data[DOMAIN].
+    """
+    from homeassistant.helpers.storage import Store as _Store
+    from .const import STORAGE_VERSION as _STORAGE_VERSION
 
-        dashboards_store: Store = Store(
-            hass, ll_dashboard.DASHBOARDS_STORAGE_VERSION, ll_dashboard.DASHBOARDS_STORAGE_KEY
-        )
-        raw = await dashboards_store.async_load()
-        if raw:
-            raw["items"] = [i for i in raw.get("items", []) if i.get("id") != item_id]
-            await dashboards_store.async_save(raw)
-    except Exception:  # noqa: BLE001
-        _LOGGER.warning("Konnte automatisch angelegtes Dashboard nicht sauber entfernen", exc_info=True)
+    own_store = _Store(hass, _STORAGE_VERSION, f"{DOMAIN}_{entry.entry_id}")
+    stored = await own_store.async_load()
+    url_path = stored.get("dashboard_url_path") if stored else None
+    item_id = stored.get("dashboard_item_id") if stored else None
+
+    if url_path:
+        try:
+            from homeassistant.components import frontend
+            from homeassistant.components.lovelace import dashboard as ll_dashboard
+            from homeassistant.components.lovelace.const import LOVELACE_DATA
+            from homeassistant.helpers.storage import Store
+
+            frontend.async_remove_panel(hass, url_path, warn_if_unknown=False)
+            if LOVELACE_DATA in hass.data:
+                storage_dashboard = hass.data[LOVELACE_DATA].dashboards.pop(url_path, None)
+                if storage_dashboard is not None:
+                    await storage_dashboard.async_delete()
+
+            dashboards_store: Store = Store(
+                hass, ll_dashboard.DASHBOARDS_STORAGE_VERSION, ll_dashboard.DASHBOARDS_STORAGE_KEY
+            )
+            raw = await dashboards_store.async_load()
+            if raw:
+                raw["items"] = [i for i in raw.get("items", []) if i.get("id") != item_id]
+                await dashboards_store.async_save(raw)
+        except Exception:  # noqa: BLE001
+            _LOGGER.warning(
+                "Konnte automatisch angelegtes Dashboard nicht sauber entfernen", exc_info=True
+            )
+
+    await own_store.async_remove()
 
 
 async def _async_write_fallback_yaml(hass: HomeAssistant, data, lovelace_config: dict[str, Any]) -> None:
