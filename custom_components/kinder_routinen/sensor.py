@@ -1,4 +1,8 @@
-"""Sensor-Plattform fuer Kinder-Routinen Punktesystem."""
+"""Sensor-Plattform fuer Kinder-Routinen Punktesystem.
+
+v0.2: Pro Routine ein "Punkte heute"/"Tagesmax"-Sensorpaar, plus zwei
+Sensoren auf Kind-Ebene fuer das gemeinsame Wochenpunkte-/Punktekonto.
+"""
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
@@ -8,21 +12,21 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import KinderRoutinenData
-from .const import CONF_TASK_COUNT, DOMAIN
+from .const import DOMAIN
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     data: KinderRoutinenData = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(
-        [
-            PunkteHeuteSensor(entry, data),
-            TagesmaxSensor(entry, data),
-            WochenpunkteSensor(entry, data),
-            PunktekontoSensor(entry, data),
-        ]
-    )
+    entities: list[SensorEntity] = [
+        WochenpunkteSensor(entry, data),
+        PunktekontoSensor(entry, data),
+    ]
+    for idx in range(len(data.routines_config)):
+        entities.append(RoutinePunkteHeuteSensor(entry, data, idx))
+        entities.append(RoutineTagesmaxSensor(entry, data, idx))
+    async_add_entities(entities)
 
 
 class _BaseSensor(SensorEntity):
@@ -34,7 +38,7 @@ class _BaseSensor(SensorEntity):
         self._data = data
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
-            name=entry.title,
+            name=data.kind_name(),
             manufacturer="Kinder-Routinen Punktesystem",
         )
 
@@ -42,30 +46,38 @@ class _BaseSensor(SensorEntity):
         self._data.add_listener(self.async_write_ha_state)
 
 
-class PunkteHeuteSensor(_BaseSensor):
-    _attr_name = "Punkte heute"
+class RoutinePunkteHeuteSensor(_BaseSensor):
     _attr_icon = "mdi:star"
 
+    def __init__(self, entry: ConfigEntry, data: KinderRoutinenData, index: int) -> None:
+        super().__init__(entry, data)
+        self._index = index
+        self._attr_name = f"{data.routine_name(index)} - Punkte heute"
+
     @property
     def unique_id(self) -> str:
-        return f"{self._entry.entry_id}_punkte_heute"
+        return f"{self._entry.entry_id}_punkte_heute_{self._index}"
 
     @property
     def native_value(self) -> int:
-        return self._data.heute_erledigt
+        return self._data.routine_state[self._index]["points_awarded"]
 
 
-class TagesmaxSensor(_BaseSensor):
-    _attr_name = "Tagesmax"
+class RoutineTagesmaxSensor(_BaseSensor):
     _attr_icon = "mdi:star-outline"
 
+    def __init__(self, entry: ConfigEntry, data: KinderRoutinenData, index: int) -> None:
+        super().__init__(entry, data)
+        self._index = index
+        self._attr_name = f"{data.routine_name(index)} - Tagesmax"
+
     @property
     def unique_id(self) -> str:
-        return f"{self._entry.entry_id}_tagesmax"
+        return f"{self._entry.entry_id}_tagesmax_{self._index}"
 
     @property
     def native_value(self) -> int:
-        return self._entry.data[CONF_TASK_COUNT]
+        return self._data.task_count(self._index)
 
 
 class WochenpunkteSensor(_BaseSensor):

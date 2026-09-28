@@ -6,6 +6,7 @@
   "documentation": "https://github.com/jacky-coke/daily_routines",
   "issue_tracker": "https://github.com/jacky-coke/daily_routines/issues",
   "iot_class": "calculated",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "homeassistant": "2024.4.0",
   "requirements": []
 }

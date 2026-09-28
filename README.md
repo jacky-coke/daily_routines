@@ -44,17 +44,16 @@ Einlösen-Button.
 **Weg 1 – Custom Integration (empfohlen, per HACS installierbar):**
 Über den "HACS"-Button oben (oder HACS → Custom Repositories → diese
 Repo-URL eintragen) installierst du `custom_components/kinder_routinen/`.
-Danach richtest du pro Routine (Morgen/Mittag/…) über **Einstellungen →
-Geräte & Dienste → Integration hinzufügen → "Kinder-Routinen Punktesystem"**
-eine Instanz ein – ein Formular fragt nach To-Do-Liste, Frist-Uhrzeit,
-Wochentagen, Tagesbonus und Notify-Ziel. Kein manuelles Helper-Anlegen mehr
-nötig, die Aufgabenzahl wird automatisch aus der To-Do-Liste ermittelt.
-Details, Funktionsumfang und was noch fehlt: siehe
+Danach genügt **Einstellungen → Geräte & Dienste → Integration hinzufügen →
+"Kinder-Routinen Punktesystem"** – ein Ein-Klick-Einrichtungsassistent fragt
+Kindname, Anzahl der Routinen und je Routine die einzelnen Aufgaben direkt ab
+(keine vorher angelegte To-Do-Liste nötig), macht am Ende einen Vorschlag für
+ein "rundes" Wochenpunkteziel samt optionaler Bonuspunkte, und richtet danach
+alles automatisch ein: eigene To-Do-Listen pro Routine, Sensoren, Punktekonto
+– inklusive eines eigenen Dashboards mit fertigen Karten in der Seitenleiste,
+ganz ohne manuellen Dashboard-Bau. Details, Funktionsumfang und was noch
+fehlt: siehe
 [`custom_components/kinder_routinen/README.md`](custom_components/kinder_routinen/README.md).
-
-Das ist Version 0.1 und deckt den Kern ab (Live-Punkte, nächtlicher Reset,
-Wochenreset, Tagesbonus) – die Belohnungs-Auswahl, der Wochenbericht und
-eine eigene Dashboard-Karte fehlen noch, siehe Roadmap dort.
 
 **Weg 2 – YAML zum Kopieren + Blueprint (das Original-Set-up):**
 Kein Add-on, keine Integration – du legst Helper von Hand an und kopierst
