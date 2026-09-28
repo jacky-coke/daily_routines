@@ -33,7 +33,7 @@ async def async_setup_entry(
     data: KinderRoutinenData = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         RoutineTodoListEntity(entry, data, idx)
-        for idx in range(len(data.routines_config))
+        for idx in range(data.routine_count())
     )
 
 
