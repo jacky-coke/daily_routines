@@ -2,42 +2,65 @@
   "config": {
     "step": {
       "user": {
-        "title": "Neue Routine einrichten",
+        "title": "Kinder-Routinen Punktesystem einrichten",
+        "description": "Für welches Kind soll das Punktesystem eingerichtet werden, und wie viele Routinen (z. B. Morgen, Mittag) soll es haben?",
         "data": {
-          "name": "Name (z. B. \"Ronja Morgen\")",
-          "todo_entity": "To-Do-Liste",
+          "kind_name": "Name des Kindes",
+          "routine_count": "Anzahl Routinen"
+        }
+      },
+      "routine": {
+        "title": "Routine {index} von {count}",
+        "description": "Trage die einzelnen Aufgaben von {kind_name} für diese Routine ein - eine Aufgabe pro Zeile. Daraus wird automatisch eine eigene To-Do-Liste erstellt.",
+        "data": {
+          "name": "Name der Routine (z. B. \"Morgen\")",
           "deadline": "Frist-Uhrzeit",
           "weekdays": "Wochentage",
-          "bonus_points": "Tagesbonus (Punkte bei vollständig fristgerechtem Tag)",
+          "tasks": "Aufgaben (eine pro Zeile)"
+        }
+      },
+      "punkte": {
+        "title": "Punktesystem",
+        "description": "Ohne Bonus ergeben die eingetragenen Aufgaben {base} Punkte pro Woche. Vorschlag für ein rundes Wochenziel: {target} Punkte - dafür {bonus_suggestion} Bonuspunkte pro Routine und komplett fristgerechtem Tag.",
+        "data": {
+          "bonus_enabled": "Bonuspunkte aktivieren",
+          "bonus_points": "Bonuspunkte pro Routine und Tag",
           "notify_target": "Notify-Ziel (z. B. notify.mobile_app_handy)"
         }
       }
     },
     "error": {
-      "empty_todo_list": "Die gewählte To-Do-Liste enthält keine Einträge. Lege zuerst Aufgaben an."
+      "no_tasks": "Bitte mindestens eine Aufgabe eintragen (eine pro Zeile).",
+      "no_weekdays": "Bitte mindestens einen Wochentag auswählen."
     },
     "abort": {
-      "already_configured": "Diese Routine ist bereits eingerichtet."
+      "already_configured": "Für dieses Kind ist bereits ein Eintrag vorhanden."
     }
   },
   "options": {
     "step": {
       "init": {
+        "title": "Kinder-Routinen Punktesystem anpassen",
+        "description": "Basis-Wochenpunkte aus den aktuellen Aufgaben: {base} (rundes Ziel: {target}). Routinen selbst (Aufgaben, Uhrzeiten) lassen sich aktuell nur durch Entfernen und neues Einrichten ändern.",
         "data": {
-          "deadline": "Frist-Uhrzeit",
-          "weekdays": "Wochentage",
-          "bonus_points": "Tagesbonus",
+          "bonus_enabled": "Bonuspunkte aktivieren",
+          "bonus_points": "Bonuspunkte pro Routine und Tag",
           "notify_target": "Notify-Ziel"
         }
       }
     }
   },
-  "entity": {
-    "sensor": {
-      "punkte_heute": { "name": "Punkte heute" },
-      "tagesmax": { "name": "Tagesmax" },
-      "wochenpunkte": { "name": "Wochenpunkte" },
-      "punktekonto": { "name": "Punktekonto" }
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Montag",
+        "tue": "Dienstag",
+        "wed": "Mittwoch",
+        "thu": "Donnerstag",
+        "fri": "Freitag",
+        "sat": "Samstag",
+        "sun": "Sonntag"
+      }
     }
   }
 }
