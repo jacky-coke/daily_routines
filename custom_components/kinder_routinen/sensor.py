@@ -2,6 +2,13 @@
 
 v0.2: Pro Routine ein "Punkte heute"/"Tagesmax"-Sensorpaar, plus zwei
 Sensoren auf Kind-Ebene fuer das gemeinsame Wochenpunkte-/Punktekonto.
+
+v1.0: Zusaetzlich pro Routine ein "Aktuelles Bild"-Sensor, der ueber sein
+entity_picture-Attribut das zur zuletzt abgehakten Aufgabe passende Bild
+zeigt (oder Grundbild/Alles-erledigt) - siehe
+KinderRoutinenData.current_image_info in __init__.py. Wird vom
+automatisch generierten Dashboard (dashboard.py) als picture-entity-Karte
+eingebunden, wenn fuer die Routine mindestens ein Bild hinterlegt ist.
 """
 from __future__ import annotations
 
@@ -23,14 +30,16 @@ async def async_setup_entry(
         WochenpunkteSensor(entry, data),
         PunktekontoSensor(entry, data),
     ]
-    for idx in range(len(data.routines_config)):
+    for idx in range(data.routine_count()):
         entities.append(RoutinePunkteHeuteSensor(entry, data, idx))
         entities.append(RoutineTagesmaxSensor(entry, data, idx))
+        entities.append(RoutineAktuellesBildSensor(entry, data, idx))
     async_add_entities(entities)
 
 
-class _BaseSensor(SensorEntity):
-    _attr_state_class = SensorStateClass.MEASUREMENT
+class _DeviceSensorMixin:
+    """Gemeinsames Grundgeruest (Device-Zuordnung, Listener-Anbindung)."""
+
     _attr_has_entity_name = True
 
     def __init__(self, entry: ConfigEntry, data: KinderRoutinenData) -> None:
@@ -44,6 +53,12 @@ class _BaseSensor(SensorEntity):
 
     async def async_added_to_hass(self) -> None:
         self._data.add_listener(self.async_write_ha_state)
+
+
+class _BaseSensor(_DeviceSensorMixin, SensorEntity):
+    """Fuer numerische Zaehler-Sensoren (Punkte, Tagesmax, ...)."""
+
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
 
 class RoutinePunkteHeuteSensor(_BaseSensor):
@@ -78,6 +93,32 @@ class RoutineTagesmaxSensor(_BaseSensor):
     @property
     def native_value(self) -> int:
         return self._data.task_count(self._index)
+
+
+class RoutineAktuellesBildSensor(_DeviceSensorMixin, SensorEntity):
+    """v1.0: zeigt per entity_picture das zur aktuellen Routinen-Phase
+    passende Bild - kein state_class, da kein numerischer Messwert."""
+
+    _attr_icon = "mdi:image-outline"
+
+    def __init__(self, entry: ConfigEntry, data: KinderRoutinenData, index: int) -> None:
+        super().__init__(entry, data)
+        self._index = index
+        self._attr_name = f"{data.routine_name(index)} - Aktuelles Bild"
+
+    @property
+    def unique_id(self) -> str:
+        return f"{self._entry.entry_id}_bild_{self._index}"
+
+    @property
+    def native_value(self) -> str:
+        _, label = self._data.current_image_info(self._index)
+        return label
+
+    @property
+    def entity_picture(self) -> str | None:
+        image, _ = self._data.current_image_info(self._index)
+        return image
 
 
 class WochenpunkteSensor(_BaseSensor):

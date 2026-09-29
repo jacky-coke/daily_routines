@@ -16,6 +16,11 @@ erzeugt und der Nutzer per persistent_notification auf die manuelle
 2-Klick-Einrichtung hingewiesen. Die Einrichtung des restlichen
 Integrationsumfangs (Punktevergabe, To-Do-Listen, Sensoren) ist von einem
 Fehlschlag hier vollstaendig unabhaengig.
+
+v1.0: zusaetzlich pro Routine eine picture-entity-Karte mit dem "Aktuelles
+Bild"-Sensor (siehe sensor.py), sofern fuer die Routine ueberhaupt Bilder
+hinterlegt wurden - sonst wird die Karte ausgelassen, damit niemand ohne
+hochgeladene Bilder eine leere/kaputte Bildkarte auf dem Dashboard sieht.
 """
 from __future__ import annotations
 
@@ -40,15 +45,30 @@ def _build_lovelace_config(hass: HomeAssistant, entry: ConfigEntry, data) -> dic
     """Baut die Karten anhand der tatsaechlich vergebenen Entity-IDs."""
     cards: list[dict[str, Any]] = []
 
-    for idx, cfg in enumerate(data.routines_config):
+    for idx in range(data.routine_count()):
         todo_entity = _entity_id(hass, "todo", f"{entry.entry_id}_todo_{idx}")
         punkte_entity = _entity_id(hass, "sensor", f"{entry.entry_id}_punkte_heute_{idx}")
+        bild_entity = _entity_id(hass, "sensor", f"{entry.entry_id}_bild_{idx}")
+        routine_name = data.routine_name(idx)
+        # v1.0: Bild der aktuellen Aufgabe (falls Bilder hinterlegt wurden)
+        # direkt ueber der To-Do-Liste der Routine, wie in Niks
+        # urspruenglichem YAML-Dashboard ("Fortschrittsbild").
+        if bild_entity and data.has_any_image(idx):
+            cards.append(
+                {
+                    "type": "picture-entity",
+                    "entity": bild_entity,
+                    "name": routine_name,
+                    "show_state": True,
+                    "show_name": True,
+                }
+            )
         if todo_entity:
             cards.append(
                 {
                     "type": "todo-list",
                     "entity": todo_entity,
-                    "title": cfg["name"],
+                    "title": routine_name,
                 }
             )
         if punkte_entity:
@@ -56,7 +76,7 @@ def _build_lovelace_config(hass: HomeAssistant, entry: ConfigEntry, data) -> dic
                 {
                     "type": "gauge",
                     "entity": punkte_entity,
-                    "name": f"{cfg['name']} - heute",
+                    "name": f"{routine_name} - heute",
                     "min": 0,
                     "max": max(data.task_count(idx), 1),
                     "severity": {"red": 0, "yellow": 1, "green": data.task_count(idx)},
@@ -66,10 +86,11 @@ def _build_lovelace_config(hass: HomeAssistant, entry: ConfigEntry, data) -> dic
     wochenpunkte_entity = _entity_id(hass, "sensor", f"{entry.entry_id}_wochenpunkte")
     punktekonto_entity = _entity_id(hass, "sensor", f"{entry.entry_id}_punktekonto")
 
+    routine_range = range(data.routine_count())
     weekly_target = max(
-        sum(data.task_count(i) * len(data.weekdays(i)) for i in range(len(data.routines_config)))
+        sum(data.task_count(i) * len(data.weekdays(i)) for i in routine_range)
         + (
-            data.bonus_points() * sum(len(data.weekdays(i)) for i in range(len(data.routines_config)))
+            data.bonus_points() * sum(len(data.weekdays(i)) for i in routine_range)
             if data.bonus_enabled()
             else 0
         ),

@@ -19,6 +19,14 @@
           "tasks": "Aufgaben (eine pro Zeile)"
         }
       },
+      "routine_bilder": {
+        "title": "Bilder für Routine {index} von {count}",
+        "description": "Optional: lade für jede Aufgabe ein Bild hoch, das angezeigt wird, sobald diese Aufgabe als letzte erledigt wurde. Aufgaben in dieser Routine:\n{tasks_list}\n\nZusätzlich kannst du ein Grundbild (bevor überhaupt etwas erledigt ist) und ein Bild für \"alles erledigt\" hochladen. Alles ist optional und kann später über \"Konfigurieren\" ergänzt oder geändert werden.",
+        "data": {
+          "bild_grundbild": "Grundbild (bevor etwas erledigt ist)",
+          "bild_alles_erledigt": "Bild wenn alles erledigt ist"
+        }
+      },
       "punkte": {
         "title": "Punktesystem",
         "description": "Ohne Bonus ergeben die eingetragenen Aufgaben {base} Punkte pro Woche. Vorschlag für ein rundes Wochenziel: {target} Punkte - dafür {bonus_suggestion} Bonuspunkte pro Routine und komplett fristgerechtem Tag.",
@@ -41,13 +49,106 @@
     "step": {
       "init": {
         "title": "Kinder-Routinen Punktesystem anpassen",
-        "description": "Basis-Wochenpunkte aus den aktuellen Aufgaben: {base} (rundes Ziel: {target}). Routinen selbst (Aufgaben, Uhrzeiten) lassen sich aktuell nur durch Entfernen und neues Einrichten ändern.",
+        "menu_options": {
+          "einstellungen": "Bonuspunkte & Benachrichtigung",
+          "routine_hinzufuegen": "Neue Routine hinzufügen",
+          "routine_aufgaben_bearbeiten": "Aufgaben einer Routine bearbeiten",
+          "routine_aufgabe_bild": "Bild einer Aufgabe ändern",
+          "routine_einstellungen_bearbeiten": "Routine bearbeiten (Name, Frist, Wochentage, Grundbilder)",
+          "routine_entfernen": "Routine entfernen"
+        }
+      },
+      "einstellungen": {
+        "title": "Bonuspunkte & Benachrichtigung",
+        "description": "Basis-Wochenpunkte aus den aktuellen Aufgaben: {base} (rundes Ziel: {target}).",
         "data": {
           "bonus_enabled": "Bonuspunkte aktivieren",
           "bonus_points": "Bonuspunkte pro Routine und Tag",
           "notify_target": "Notify-Ziel"
         }
+      },
+      "routine_hinzufuegen": {
+        "title": "Neue Routine hinzufügen",
+        "description": "Trage die einzelnen Aufgaben für diese neue Routine ein - eine Aufgabe pro Zeile. Daraus wird automatisch eine eigene To-Do-Liste erstellt.",
+        "data": {
+          "name": "Name der Routine (z. B. \"Morgen\")",
+          "deadline": "Frist-Uhrzeit",
+          "weekdays": "Wochentage",
+          "tasks": "Aufgaben (eine pro Zeile)"
+        }
+      },
+      "routine_hinzufuegen_bilder": {
+        "title": "Bilder für die neue Routine",
+        "description": "Optional: lade für jede Aufgabe ein Bild hoch, das angezeigt wird, sobald diese Aufgabe als letzte erledigt wurde. Aufgaben in dieser Routine:\n{tasks_list}\n\nZusätzlich kannst du ein Grundbild und ein Bild für \"alles erledigt\" hochladen. Alles ist optional.",
+        "data": {
+          "bild_grundbild": "Grundbild (bevor etwas erledigt ist)",
+          "bild_alles_erledigt": "Bild wenn alles erledigt ist"
+        }
+      },
+      "routine_aufgaben_bearbeiten": {
+        "title": "Aufgaben welcher Routine bearbeiten?",
+        "data": {
+          "routine_index": "Routine"
+        }
+      },
+      "aufgaben_text": {
+        "title": "Aufgaben bearbeiten: {routine_name}",
+        "description": "Eine Aufgabe pro Zeile. Unveränderte Zeilen behalten ihren Status und ihr Bild. Entfernte Zeilen werden gelöscht, neue Zeilen als neue Aufgabe angelegt.",
+        "data": {
+          "tasks": "Aufgaben (eine pro Zeile)"
+        }
+      },
+      "routine_aufgabe_bild": {
+        "title": "Bild welcher Routine ändern?",
+        "data": {
+          "routine_index": "Routine"
+        }
+      },
+      "aufgabe_bild_wahl": {
+        "title": "Aufgabenbild ändern: {routine_name}",
+        "description": "Wähle die Aufgabe aus und lade das neue Bild hoch.",
+        "data": {
+          "task_uid": "Aufgabe",
+          "bild": "Neues Bild"
+        }
+      },
+      "routine_einstellungen_bearbeiten": {
+        "title": "Welche Routine bearbeiten?",
+        "data": {
+          "routine_index": "Routine"
+        }
+      },
+      "routine_einstellungen_form": {
+        "title": "Routine bearbeiten: {routine_name}",
+        "description": "Grundbild bzw. \"alles erledigt\"-Bild nur hochladen, wenn sie ersetzt werden sollen - sonst leer lassen.",
+        "data": {
+          "name": "Name der Routine",
+          "deadline": "Frist-Uhrzeit",
+          "weekdays": "Wochentage",
+          "bild_grundbild_neu": "Neues Grundbild (optional)",
+          "bild_alles_erledigt_neu": "Neues \"alles erledigt\"-Bild (optional)"
+        }
+      },
+      "routine_entfernen": {
+        "title": "Welche Routine entfernen?",
+        "data": {
+          "routine_index": "Routine"
+        }
+      },
+      "routine_entfernen_bestaetigen": {
+        "title": "Routine wirklich entfernen?",
+        "description": "Die Routine \"{routine_name}\" wird inklusive ihrer To-Do-Liste, Sensoren und aller hochgeladenen Bilder unwiderruflich entfernt.",
+        "data": {
+          "bestaetigen": "Ja, \"{routine_name}\" entfernen"
+        }
       }
+    },
+    "error": {
+      "no_tasks": "Bitte mindestens eine Aufgabe eintragen (eine pro Zeile).",
+      "no_weekdays": "Bitte mindestens einen Wochentag auswählen."
+    },
+    "abort": {
+      "no_routines": "Für dieses Kind sind aktuell keine Routinen vorhanden."
     }
   },
   "selector": {

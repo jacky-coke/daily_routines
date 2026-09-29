@@ -1,141 +1,133 @@
 # Kinder-Routinen mit Live-Punktesystem für Home Assistant
 
+🇩🇪 Deutsch · [🇬🇧 English](README.en.md)
+
 [![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jacky-coke&repository=daily_routines&category=integration)
 
 > Aus "hat sie die Zähne geputzt?" wird ein Dashboard, das von selbst mitzählt:
 > jede pünktlich erledigte Aufgabe gibt sofort einen Punkt, die Woche läuft auf
-> ein rundes Ziel, und am Ende winkt eine selbst gewählte Belohnung – ganz ohne
+> ein rundes Ziel, und der Fortschritt ist als Bild sichtbar – ganz ohne
 > Zettel an der Kühlschranktür.
 
-Ein Dashboard + Automations-Set für Home Assistant, mit dem eine tägliche
-Kinder-Routine (z. B. "Morgenroutine" und "Mittagsroutine" als To-Do-Listen)
-in ein Punkte-/Belohnungssystem verwandelt wird:
+## Was diese Integration kann
 
-- Jede pünktlich (vor einer Frist-Uhrzeit) abgehakte Aufgabe gibt sofort
-  1 Punkt (**live**, nicht erst am Abend ausgewertet).
-- Ein Tagesbonus für einen komplett fristgerechten Tag.
-- Ein Wochenzähler (setzt sich montags zurück) und ein Sparkonto (setzt sich
-  nie zurück), aus dem Belohnungen bei festgelegten Schwellwerten eingelöst
-  werden können.
-- Ein Dashboard-Panel ("Punkte-Barometer") mit Balkenanzeige für Heute /
-  Diese Woche / Gesamt, plus Fortschrittsbildern/-überschriften während der
-  Routine.
-- Ein Belohnungs-Button mit Bestätigungsdialog, der Punkte abzieht und eine
-  Benachrichtigung verschickt.
+- Ein **Einrichtungsassistent** fragt Kindname, Routinen (z. B. "Morgen",
+  "Mittag") und die Aufgaben je Routine direkt ab. Keine To-Do-Liste muss
+  vorher von Hand angelegt werden.
+- Jede pünktlich (vor einer selbst gewählten Frist-Uhrzeit) abgehakte
+  Aufgabe gibt **sofort** einen Punkt – nicht erst abends ausgewertet.
+- Ein **Wochenzähler** (läuft montags auf 0 zurück) und ein **Punktekonto**
+  (läuft nie zurück), gegen das später Belohnungen eingelöst werden können.
+- Der Assistent schlägt am Ende automatisch ein "rundes" Wochenziel vor
+  (z. B. 100 statt 87 Punkte) – optional ergänzt um Bonuspunkte für einen
+  komplett fristgerechten Tag.
+- Pro Aufgabe lässt sich optional ein **eigenes Bild** hochladen, dazu ein
+  Grundbild und ein "Alles erledigt"-Bild. Das passende Bild wird automatisch
+  angezeigt, sobald die jeweils letzte Aufgabe erledigt wurde.
+- Direkt nach der Einrichtung entsteht automatisch ein **eigenes Dashboard**
+  in der Seitenleiste – mit To-Do-Listen, Punkteanzeige und Fortschrittsbild.
+  Kein manuelles Bauen von Karten nötig.
+- Über **"Konfigurieren"** am Eintrag lässt sich später alles nachträglich
+  anpassen: Routinen hinzufügen oder entfernen, Aufgaben bearbeiten, Bilder
+  austauschen – ganz ohne Neueinrichtung.
 
-Das Ganze ist aus einem konkreten Set-up für eine Morgen- und Mittagsroutine
-mit insgesamt 17 Aufgaben/Tag entstanden (Ziel: 100 Punkte in einer perfekten
-Woche). Alle Beispiele in diesem Repo verwenden generische Platzhalter
-(`kind` statt eines echten Namens) und ein neutrales Benachrichtigungsziel –
-du musst deine eigenen Entity-IDs, Aufgaben und dein eigenes Notify-Ziel
-einsetzen.
+## Warum dieses Projekt entstanden ist
 
-## Screenshot
+Der Auslöser war eine ganz konkrete Situation bei uns zu Hause: Unsere
+Tochter Ronja ist neurodivergent, und ihr fällt es morgens besonders schwer,
+eine Sammelanweisung wie "Mach dich fertig" selbstständig in die einzelnen
+nötigen Schritte zu zerlegen und der Reihe nach abzuarbeiten.
+
+Dafür gibt es einen nachvollziehbaren Hintergrund. Das eigenständige Planen,
+Starten und Durchhalten mehrstufiger Aufgaben gehört zu den sogenannten
+**exekutiven Funktionen** – einer Gruppe kognitiver Fähigkeiten, zu denen
+unter anderem Handlungsplanung, Aufgabeneinstieg ("Task-Initiation") und
+Selbstorganisation zählen. Bei vielen neurodivergenten Kindern, etwa mit
+ADHS oder im Autismus-Spektrum, sind genau diese Funktionen unterschiedlich
+stark ausgeprägt (bekannt geworden ist dieses Erklärmodell vor allem durch
+den ADHS-Forscher Russell Barkley). Eine Anweisung wie "Mach dich fertig"
+bündelt für ein Kind mit solchen Schwierigkeiten unsichtbar sieben, acht
+oder mehr Einzelschritte – jeder davon eine eigene kleine Entscheidung, an
+der der ganze Ablauf hängen bleiben kann.
+
+Ein in Pädagogik und Ergotherapie bewährter Ansatz dagegen ist die
+sogenannte **Aufgabenanalyse** ("Task Analysis"): Eine komplexe Handlung
+wird in einzelne, sichtbare und abhakbare Schritte zerlegt, kombiniert mit
+unmittelbarer, positiver Rückmeldung nach jedem einzelnen Schritt. Genau
+das bildet dieses Projekt technisch ab – eine klare, feste Aufgabenliste
+statt einer vagen Gesamtanweisung, ein Punkt sofort nach jedem erledigten
+Schritt statt erst abends, und ein Fortschrittsbild, das sichtbar macht,
+wie nah das Ziel schon ist.
+
+Wichtig ist mir dabei: Das hier ist ein Alltagswerkzeug, das eine bewährte
+Strategie technisch unterstützt – keine Diagnostik und keine Therapie. Bei
+Fragen zur individuellen Förderung lohnt sich immer das Gespräch mit
+Kinderarzt, Ergotherapie oder dem schulischen Förderzentrum.
+
+## So sieht es in der Praxis aus
 
 ![Dashboard-Beispiel: Routinen-Liste, Fortschrittsbild und Punkte-Barometer](images/dashboard-beispiel.png)
 
-Das Original-Dashboard einer Familie, die dieses System täglich nutzt – links
-die abhakbare Routine, in der Mitte das Fortschrittsbild, rechts das
-Punkte-Barometer (Heute / Woche / Gesamt) samt Belohnungs-Checkliste und
-Einlösen-Button.
+Das ist Ronjas echtes, täglich genutztes Dashboard – links die abhakbare
+Routine, in der Mitte das Fortschrittsbild, rechts das Punkte-Barometer.
 
-## Zwei Wege, das zu nutzen
+**Wichtiger Hinweis:** Dieser Screenshot zeigt mein eigenes, gewachsenes
+Dashboard und geht über das hinaus, was die Integration automatisch
+anlegt. Zusätzlich verwendet werden dort:
 
-**Weg 1 – Custom Integration (empfohlen, per HACS installierbar):**
-Über den "HACS"-Button oben (oder HACS → Custom Repositories → diese
-Repo-URL eintragen) installierst du `custom_components/kinder_routinen/`.
-Danach genügt **Einstellungen → Geräte & Dienste → Integration hinzufügen →
-"Kinder-Routinen Punktesystem"** – ein Ein-Klick-Einrichtungsassistent fragt
-Kindname, Anzahl der Routinen und je Routine die einzelnen Aufgaben direkt ab
-(keine vorher angelegte To-Do-Liste nötig), macht am Ende einen Vorschlag für
-ein "rundes" Wochenpunkteziel samt optionaler Bonuspunkte, und richtet danach
-alles automatisch ein: eigene To-Do-Listen pro Routine, Sensoren, Punktekonto
-– inklusive eines eigenen Dashboards mit fertigen Karten in der Seitenleiste,
-ganz ohne manuellen Dashboard-Bau. Details, Funktionsumfang und was noch
-fehlt: siehe
-[`custom_components/kinder_routinen/README.md`](custom_components/kinder_routinen/README.md).
+- die HACS-Karte [`calendar-card-pro`](https://github.com/alexpfau/calendar-card-pro)
+  für die Kalender-Kacheln ("Stundenplan", "Schultermine des Tages",
+  "Ronjas Termine"),
+- die Custom-Integration [`ms365_calendar`](https://github.com/RogerSelwyn/MS365-Calendar)
+  ("Microsoft 365 – Calendar" von RogerSelwyn, über HACS) zur Anbindung des
+  Microsoft-365-Kalenders für den Stundenplan,
+- die HACS-Karte [`bar-card`](https://github.com/custom-cards/bar-card) für
+  den vertikalen Balken-Stil des Punkte-Barometers,
+- eine "Belohnung einlösen"-Auswahl samt Einlösen-Button – Teil meines
+  eigenen, ursprünglich manuell gebauten Setups, **noch nicht** Teil dieser
+  Integration (siehe [Roadmap](#roadmap)),
+- eine eigene, individuell erstellte Bildserie als Fortschrittsbild (nicht
+  Teil dieses Repos).
 
-**Weg 2 – YAML zum Kopieren + Blueprint (das Original-Set-up):**
-Kein Add-on, keine Integration – du legst Helper von Hand an und kopierst
-Automationen/Dashboard als YAML. Mehr Kontrolle, mehr manueller Aufwand,
-dafür exakt das seit Monaten produktiv laufende Original. Die zwei
-Live-Punkte-Automationen gibt es zusätzlich als
-[Blueprint](blueprints/automation/kinder-routine-live-punkte.yaml), den Rest
-kopierst du als YAML und passt Entity-IDs an. Anleitung dazu weiter unten.
+Die Integration selbst liefert eine schlichtere, aber sofort funktionierende
+Basis ganz ohne diese Extras – Details dazu weiter unten.
 
-## Voraussetzungen (Weg 2 – YAML)
+## Installation
+
+- In HACS → "Custom repositories" diese Repo-URL eintragen, Kategorie
+  "Integration" (oder den Badge oben auf dieser Seite nutzen).
+- Home Assistant neu starten.
+- **Einstellungen → Geräte & Dienste → Integration hinzufügen → "Kinder-Routinen
+  Punktesystem"** wählen – der Assistent führt Schritt für Schritt durch die
+  Einrichtung: Kindname und Anzahl der Routinen, Aufgaben je Routine,
+  optional Bilder je Aufgabe, zuletzt das Punktesystem.
+
+Eine ausführliche Anleitung mit Screenshots zu jedem einzelnen Schritt des
+Assistenten sowie zur nachträglichen Verwaltung gibt es in der
+[README der Integration](custom_components/kinder_routinen/README.md).
+
+## Voraussetzungen
 
 - Home Assistant (getestet mit aktuellen 2026.x-Versionen)
-- HACS, für die Dashboard-Karte [`bar-card`](https://github.com/custom-cards/bar-card)
-  (die Balkenanzeigen im Barometer)
-- Zwei (oder mehr) `todo`-Listen für die jeweilige Routine
+- HACS, zur Installation der Integration
+
+Keine weiteren Helfer, Automationen oder Custom Cards sind nötig – alles
+Nötige richtet die Integration selbst ein.
 
 ## Aufbau dieses Repos
 
 ```
-helpers/helpers.md           Alle benötigten Helper (Counter, Input-Number, ...) mit Erklärung
-blueprints/automation/       Wiederverwendbarer Blueprint für die Live-Punktevergabe
-automations/                 Die restlichen Automationen als YAML zum Kopieren
-scripts/                     Das Belohnungs-Einlöse-Script
-dashboard/                   Die Dashboard-Sektion "Punkte-Barometer" als YAML
-images/                      Hinweise zu den Fortschrittsbildern
+custom_components/kinder_routinen/   Die Integration selbst (siehe eigene README)
+images/                              Beispiel-Dashboard-Screenshot (siehe oben)
 ```
 
-## Setup – Schritt für Schritt
+## Roadmap
 
-1. **To-Do-Listen anlegen**: z. B. `todo.kind_morgenroutine` und
-   `todo.kind_mittagsroutine` mit deinen eigenen Aufgaben (Einstellungen →
-   Geräte & Dienste → Helfer → To-do-Liste, oder als `todo` Integration).
-   Merke dir die Anzahl der Aufgaben pro Liste – die brauchst du gleich als
-   Maximalwert für die Tracker-Helper.
-
-2. **Helper anlegen**: siehe [`helpers/helpers.md`](helpers/helpers.md) für die
-   vollständige Liste (2× Counter, 2× Input-Number, 1× Input-Boolean,
-   1× Input-Select, mehrere Input-Text). Passe Min/Max-Werte an deine
-   Listengröße an.
-
-3. **Live-Punkte-Automationen einrichten**: entweder den
-   [Blueprint importieren](blueprints/automation/kinder-routine-live-punkte.yaml)
-   und pro Routine (Morgen/Mittag) eine Instanz davon anlegen – dabei wählst
-   du deine To-Do-Liste, deinen Tracker-Helper, die Frist-Uhrzeit und die
-   Wochentage über ein Formular aus. Oder die YAML-Dateien in
-   `automations/` direkt kopieren und die Platzhalter-Entity-IDs ersetzen.
-
-4. **Restliche Automationen einrichten** aus `automations/`:
-   - `tagesabschluss_bonus.yaml` – Tagesbonus + Status für den Wochenbericht
-   - `wochenbericht.yaml` – freitagabends eine Zusammenfassung verschicken
-   - `wochenreset.yaml` – montags früh Wochenzähler & Tagesstatus zurücksetzen
-   - `nachtlicher_reset_morgen.yaml` / `nachtlicher_reset_mittag.yaml` –
-     nachts die To-Do-Listen wieder auf "offen" setzen
-   - `ausblenden_ab_frist.yaml` – Dashboard-Sichtbarkeits-Helper nach der
-     Frist wieder ausblenden
-   - `bild_aktualisieren.yaml` – **optional**, nur relevant, wenn du mit
-     Fortschrittsbildern arbeitest (siehe `images/`)
-
-5. **Belohnungs-Script** aus `scripts/belohnung_einloesen.yaml` einrichten
-   und dein eigenes Notify-Ziel eintragen (siehe Hinweis unten).
-
-6. **Dashboard-Sektion** aus `dashboard/routinen_dashboard_view.yaml` in
-   dein Lovelace-Dashboard übernehmen (als eigene "sections"-Ansicht oder als
-   Teil einer bestehenden). `bar-card` muss über HACS installiert sein.
-
-## Wichtig: Benachrichtigungen anpassen
-
-Das Original-Set-up verschickt Benachrichtigungen über einen privaten
-Webhook (`rest_command.notify_router`), der individuell für die
-ursprüngliche Familie eingerichtet ist – der funktioniert bei dir nicht.
-Deshalb ist in allen YAML-Dateien hier stattdessen `notify.notify`
-(Standard-Benachrichtigung in Home Assistant) eingetragen. Ersetze das durch
-dein eigenes Ziel, z. B. `notify.mobile_app_<dein_handy>` oder eine eigene
-Telegram-/Signal-/Webhook-Integration.
-
-## Die Punkte-Mathematik anpassen
-
-Die Formel: `Wochenmaximum = (Aufgaben pro Tag × 1 Punkt + Tagesbonus) × Anzahl Schultage`.
-Im Original: (17 Aufgaben × 1 + 3 Bonus) × 5 Tage = 100 Punkte/Woche.
-Willst du eine andere Zielsumme oder eine andere Aufgabenzahl, passe den
-Tagesbonus in `tagesabschluss_bonus.yaml` und die Max-Werte der Tracker-Helper
-entsprechend an, damit es wieder aufgeht.
+- Belohnungs-Auswahl und Einlösen-Button als native Bestandteile der
+  Integration (aktuell noch manuell zu bauen, siehe Hinweis oben).
+- Freitags-Wochenbericht mit Status je Wochentag.
+- Vollständige englische Übersetzung auch der Integrations-Oberfläche
+  (aktuell nur diese README).
 
 ## Lizenz
 
