@@ -45,7 +45,16 @@ MAX_ROUTINES = 6
 NICE_WEEKLY_TARGETS = [30, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500]
 
 # Ordner unter config/www, in dem hochgeladene Aufgaben-/Routinenbilder
-# dauerhaft abgelegt werden (automatisch unter /local/<WWW_IMAGE_SUBDIR>/...
-# von Home Assistant ausgeliefert - keine eigene Static-Path-Registrierung
-# noetig).
+# dauerhaft abgelegt werden.
 WWW_IMAGE_SUBDIR = "kinder_routinen"
+
+# Eigener, garantiert kollisionsfreier URL-Pfad, unter dem images.py diese
+# Bilder ausliefert. Home Assistants eingebauter /local-Pfad (config/www)
+# wird von der frontend-Komponente NUR beim HA-Start registriert, und auch
+# nur dann, wenn der Ordner zu diesem Zeitpunkt schon existiert - unser
+# Bilderordner entsteht aber typischerweise erst beim ersten Bild-Upload,
+# oft lange nach dem Start. Ueber /local ausgelieferte Bilder wuerden also
+# bis zum naechsten HA-Neustart mit 404 fehlschlagen (in der Testinstanz
+# live nachvollzogen). Deshalb registriert images.py diesen eigenen Pfad
+# selbst und dynamisch beim ersten Upload - unabhaengig vom Ladezeitpunkt.
+STATIC_URL_PATH = "/kinder_routinen_media"
